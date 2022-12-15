@@ -14,5 +14,5 @@ func main() {
 	})
 	http.HandleFunc("/weather", weather.Handler)
 
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(":80", nil)
 }

@@ -1,0 +1,28 @@
+# Build the Go Binary.
+FROM golang:1.19 as build_jh
+ENV CGO_ENABLED 0
+ARG BUILD_REF
+
+COPY . /jh-weather
+WORKDIR /jh-weather/app/
+
+RUN go build -ldflags "-X main.build=${BUILD_REF}" -o jh-api
+
+# Run the Go Binary in Alpine.
+FROM alpine:3.16
+ARG BUILD_DATE
+ARG BUILD_REF
+ARG APPID
+ENV APP_ID $APPID
+EXPOSE 80/tcp
+WORKDIR /jh-weather
+COPY --from=build_jh /jh-weather/app/jh-api /jh-weather/jh-api
+RUN chmod +x -R /jh-weather/*
+CMD ["./jh-api"]
+
+LABEL org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.title="jh-weather-api" \
+      org.opencontainers.image.authors="Ramesh Naidu <rameshnaidu@gmail.com>" \
+      org.opencontainers.image.source="https://github.com/wooknight/jh-weather/app/jhweather" \
+      org.opencontainers.image.revision="${BUILD_REF}" \
+      org.opencontainers.image.vendor="jh,Inc"

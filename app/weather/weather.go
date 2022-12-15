@@ -23,13 +23,29 @@ var APP_ID = os.Getenv("APP_ID")
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	urlParams := r.URL.Query()
+	if _, ok := urlParams["lat"]; !ok {
+		log.Println("Latitude is not set")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := urlParams["lng"]; !ok {
+		log.Println("Longitude is not set")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	var lat, lng float64
 	var err error
 	if lat, err = strconv.ParseFloat(urlParams["lat"][0], 64); err != nil {
 		log.Printf("Latitude is invalid . Need a float - %s \n", urlParams["lat"])
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	if lng, err = strconv.ParseFloat(urlParams["lng"][0], 64); err != nil {
 		log.Printf("Longitude is invalid . Need a float - %s \n", urlParams["lng"])
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	url := fmt.Sprintf(URL, lat, lng, APP_ID)
@@ -55,10 +71,18 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			Pressure float64 `json:"pressure"`
 			Humidity float64 `json:"humidity"`
 		}
+		// Alerts []struct { //only applicable for API 3.0
+		// 	Description string `json:"description"`
+		// }
 	}{}
 	for {
 
 		resp, err := http.Get(url)
+		if resp.StatusCode != 200 {
+			log.Printf("Encountered an error with the request[%s] at time %v \n", resp.Status, time.Now())
+			fmt.Fprintf(w, "Encountered an error with the request[%s] at time %v \n", resp.Status, time.Now())
+			return
+		}
 		if err != nil {
 			if err.(net.Error).Temporary() {
 				continue
@@ -71,6 +95,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Encountered an error %v at time %v \n", err, time.Now())
 			return
 		}
+		log.Println(content)
 
 		fmt.Fprintf(w, "Content %v - \n%s\n", content.Main, curTemp(content.Main.Temp))
 
