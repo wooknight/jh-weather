@@ -1,9 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -29,14 +26,7 @@ func main() {
 		resp["health"] = "healthy"
 		resp["version"] = build
 		resp["uptime"] = uptime().String()
-		jsonResp, err := json.Marshal(resp)
-		if err != nil {
-			log.Printf("Error happened in JSON marshal. Err: %s\n", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "encountered an error")
-			return
-		}
-		w.Write(jsonResp)
+		weather.OutputJSON(resp, w)
 	})
 	http.HandleFunc("/weather", weather.Handler)
 
