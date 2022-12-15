@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -19,16 +20,17 @@ func init() {
 	startTime = time.Now()
 }
 
-func main() {
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		resp := make(map[string]string)
-		resp["health"] = "healthy"
-		resp["version"] = build
-		resp["uptime"] = uptime().String()
-		weather.OutputJSON(resp, w)
-	})
-	http.HandleFunc("/weather", weather.Handler)
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	resp := make(map[string]string)
+	resp["health"] = "healthy"
+	resp["version"] = build
+	resp["uptime"] = uptime().String()
+	weather.OutputJSON(resp, w)
+}
 
-	http.ListenAndServe(":80", nil)
+func main() {
+	http.HandleFunc("/health", healthHandler)
+	http.HandleFunc("/weather", weather.Handler)
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
