@@ -34,7 +34,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
+	w.Header().Set("Content-Type", "application/json")
 	var lat, lng float64
 	var err error
 	if lat, err = strconv.ParseFloat(urlParams["lat"][0], 64); err != nil {
@@ -51,10 +51,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	url := fmt.Sprintf(URL, lat, lng, APP_ID)
 	log.Println(url)
 	content := struct {
-		Coord struct {
-			Lon float64 `json:"lon"`
-			Lat float64 `json:"lat"`
-		}
 		Weather []struct {
 			Id          float64 `json:"id"`
 			Main        string  `json:"main"`
