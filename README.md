@@ -4,6 +4,7 @@ Weather project
 
 
 Steps to run the application 
-1) make jh
-2) docker run -d -p <HOST PORT>:80 docker run -d jh-api-amd64:1.0
+1) export APP_ID=<api key>
+2) make jh
+3) docker run -d -p <HOST PORT>:80 docker run -d jh-api-amd64:1.0
 
