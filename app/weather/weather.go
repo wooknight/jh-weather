@@ -38,12 +38,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	if lat, err = strconv.ParseFloat(urlParams["lat"][0], 64); err != nil {
 		log.Printf("Latitude is invalid . Need a float - %s \n", urlParams["lat"])
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Latitude and Longitide needs to be set"))
 		return
 	}
 	if lng, err = strconv.ParseFloat(urlParams["lng"][0], 64); err != nil {
 		log.Printf("Longitude is invalid . Need a float - %s \n", urlParams["lng"])
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("APP ID is missing"))
+		w.Write([]byte("Latitude and Longitide needs to be set"))
 		return
 	}
 	if len(APP_ID) == 0 {
